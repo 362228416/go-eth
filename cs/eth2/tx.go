@@ -1,7 +1,9 @@
 package eth2
 
 import (
+	"bytes"
 	"context"
+	"encoding/hex"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -50,4 +52,31 @@ func SignTx(tx *types.Transaction, hexkey string) *types.Transaction {
 		return nil
 	}
 	return signedTx
+}
+
+func CreateTokenSignTx(priv string, to string, contractAddress string, value *big.Int, nonce int) *types.Transaction {
+	// 手动构建input
+	methodId := common.FromHex("0xa9059cbb")
+	var data []byte
+	data = append(data, methodId...)
+	paddedAddress := common.LeftPadBytes(common.HexToAddress(to).Bytes(), 32)
+	data = append(data, paddedAddress...)
+	paddedAmount := common.LeftPadBytes(value.Bytes(), 32)
+	data = append(data, paddedAmount...)
+
+	gas := uint64(65000)
+	//gasPrice := big.NewInt(1000000000)
+	gasPrice, _ := client.SuggestGasPrice(context.Background())
+	tx := types.NewTransaction(uint64(nonce), common.HexToAddress(contractAddress), big.NewInt(0), gas, gasPrice, data)
+	signTx := SignTx(tx, priv)
+
+	log.Println("create token tx chainId=", ChainID, "nonce=", nonce, "gasPrice=", gasPrice, "value=", value, "to=", to)
+
+	w := new(bytes.Buffer)
+	signTx.EncodeRLP(w)
+	rawTx := hex.EncodeToString(w.Bytes())
+	log.Println("rawTx=", "0x"+rawTx)
+
+	return signTx
+
 }
