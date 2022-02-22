@@ -41,7 +41,7 @@ func newKey(rand io.Reader) (*Key, error) {
 	return newKeyFromECDSA(privateKeyECDSA), nil
 }
 
-func _hexToECSSA(hexkey string) *ecdsa.PrivateKey {
+func HexToECSSA(hexkey string) *ecdsa.PrivateKey {
 	k, _ := crypto.HexToECDSA(hexkey)
 	return k
 }
