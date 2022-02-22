@@ -1,4 +1,4 @@
-package core
+package eth2
 
 import (
 	"fmt"
