@@ -34,7 +34,7 @@ type MetaData struct {
 
 func GetTokenBalance(address string, contractAddress string, decimals int) float64 {
 	//return 0
-	if contractAddress == "" {
+	if contractAddress == "" || contractAddress == "0x0000000000000000000000000000000000000000" {
 		balance, err := client.BalanceAt(context.Background(), common.HexToAddress(address), nil)
 		if err != nil {
 			return 0
@@ -53,7 +53,7 @@ func GetTokenBalance(address string, contractAddress string, decimals int) float
 }
 
 func GetTokenBalanceBigInt(address string, contractAddress string) *big.Int {
-	if contractAddress == "" {
+	if contractAddress == "" || contractAddress == "0x0000000000000000000000000000000000000000" {
 		balance, err := client.BalanceAt(context.Background(), common.HexToAddress(address), nil)
 		if err != nil {
 			return big.NewInt(0)
