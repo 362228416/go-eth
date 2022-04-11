@@ -66,7 +66,20 @@ func CreateTokenSignTx(priv string, to string, contractAddress string, value *bi
 
 	gas := uint64(65000)
 	//gasPrice := big.NewInt(1000000000)
-	gasPrice, _ := client.SuggestGasPrice(context.Background())
+	//gasPrice, _ := client.SuggestGasPrice(context.Background())
+	var gasPrice *big.Int
+	for i := 0; i < 10; i++ {
+		gasPrice, _ = client.SuggestGasPrice(context.Background())
+		if gasPrice != nil && gasPrice.Cmp(big.NewInt(0)) > 0 {
+			break
+		} else {
+			time.Sleep(1 * time.Second)
+		}
+	}
+	if gasPrice == nil || gasPrice.Cmp(big.NewInt(0)) <= 0 {
+		log.Println("获取不到GasPrice，默认5gwei")
+		gasPrice = big.NewInt(5000000000)
+	}
 	tx := types.NewTransaction(uint64(nonce), common.HexToAddress(contractAddress), big.NewInt(0), gas, gasPrice, data)
 	signTx := SignTx(tx, priv)
 
